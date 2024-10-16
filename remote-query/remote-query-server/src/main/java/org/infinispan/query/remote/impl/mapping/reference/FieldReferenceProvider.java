@@ -62,7 +62,7 @@ public class FieldReferenceProvider {
 
    public FieldReferenceProvider(FieldDescriptor fieldDescriptor, FieldMapping fieldMapping) {
       // the property name and type are taken from the model
-      name = fieldDescriptor.getName();
+      name = fieldMapping.name();
       type = fieldDescriptor.getType();
       typeName = fieldDescriptor.getTypeName();
       repeated = fieldDescriptor.isRepeated();

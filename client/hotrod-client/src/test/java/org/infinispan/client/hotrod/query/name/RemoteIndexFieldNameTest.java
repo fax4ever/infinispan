@@ -45,8 +45,7 @@ public class RemoteIndexFieldNameTest extends SingleHotRodServerTest {
       SearchMapping searchMapping = TestingUtil.extractComponent(cache, SearchMapping.class);
       Map<String, IndexMetamodel> metamodel = searchMapping.metamodel();
       assertThat(metamodel).containsKeys(ENTITY_NAME);
-      // FIXME ISPN-13523 The index property name is not applied!
-      assertThat(metamodel.get(ENTITY_NAME).getValueFields()).containsKeys(ChangeName.DATA_FIELD_NAME);
+      assertThat(metamodel.get(ENTITY_NAME).getValueFields()).containsKeys(ChangeName.INDEX_FIELD_NAME);
 
       QueryStatistics statistics = Search.getSearchStatistics(cache).getQueryStatistics();
       statistics.clear();
