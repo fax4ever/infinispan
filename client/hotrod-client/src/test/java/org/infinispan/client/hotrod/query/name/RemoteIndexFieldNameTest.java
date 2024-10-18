@@ -41,12 +41,12 @@ public class RemoteIndexFieldNameTest extends SingleHotRodServerTest {
       return ChangeName.ChangeNameSchema.INSTANCE;
    }
 
+   @Test
    public void test() {
       SearchMapping searchMapping = TestingUtil.extractComponent(cache, SearchMapping.class);
       Map<String, IndexMetamodel> metamodel = searchMapping.metamodel();
       assertThat(metamodel).containsKeys(ENTITY_NAME);
-      // FIXME ISPN-13523 The index property name is not applied!
-      assertThat(metamodel.get(ENTITY_NAME).getValueFields()).containsKeys(ChangeName.DATA_FIELD_NAME);
+      assertThat(metamodel.get(ENTITY_NAME).getValueFields()).containsKeys(ChangeName.INDEX_FIELD_NAME);
 
       QueryStatistics statistics = Search.getSearchStatistics(cache).getQueryStatistics();
       statistics.clear();
@@ -60,7 +60,17 @@ public class RemoteIndexFieldNameTest extends SingleHotRodServerTest {
       List<ChangeName> list = query.list();
       assertThat(list).extracting(ChangeName.DATA_FIELD_NAME).containsExactly("two");
 
-      // FIXME ISPN-13523 This should be the non indexed (basically the name is not handled!)
+      assertThat(statistics.getNonIndexedQueryCount()).isOne();
+      assertThat(statistics.getLocalIndexedQueryCount()).isZero();
+
+      query = remoteCache.query(String.format("from %s c where c.%s = 'two'", ENTITY_NAME, ChangeName.INDEX_FIELD_NAME));
+      list = query.list();
+
+      // TODO ISPN-13523 Support index query on indexed renamed field
+      //    FIX indexing of remapped fields
+      assertThat(list).extracting(ChangeName.DATA_FIELD_NAME).isEmpty();
+
+      assertThat(statistics.getNonIndexedQueryCount()).isOne();
       assertThat(statistics.getLocalIndexedQueryCount()).isOne();
    }
 }
